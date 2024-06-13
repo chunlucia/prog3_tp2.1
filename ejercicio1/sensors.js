@@ -1,11 +1,30 @@
-class Sensor {}
+class Sensor {
+    constructor(id, name, type, unite, apdated_at) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.value = value
+        this.unit = unit;
+        this.updated_at = this.updated_at;
+    }
+
+    // Validar los tipos permitidos para el sensor
+    static validTypes() {
+        return ['temperature', 'humidity', 'pressure'];
+    }
+
+    set updateValue(newValue) {
+        this.value = newValue;
+        this.updated_at = new Date().toISOString(); // Actualizar la fecha a la actual
+    }
+}
 
 class SensorManager {
     constructor() {
         this.sensors = [];
     }
 
-    addSensor(sensor) {
+setaddSensor(sensor) {
         this.sensors.push(sensor);
     }
 
