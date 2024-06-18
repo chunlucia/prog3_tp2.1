@@ -1,5 +1,5 @@
 class Sensor {
-    constructor(id, name, type, unite, apdated_at) {
+    constructor(id, name, type, unit, updated_at) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -24,7 +24,7 @@ class SensorManager {
         this.sensors = [];
     }
 
-setaddSensor(sensor) {
+    addSensor(sensor) {
         this.sensors.push(sensor);
     }
 
@@ -52,7 +52,23 @@ setaddSensor(sensor) {
         }
     }
 
-    async loadSensors(url) {}
+    async loadSensors(url) {
+        try {
+            const response = await fetch(url);
+            const sensorData = await response.json();
+            this.sensors = sensorData.map(sensor => new Sensor(
+                sensor.id,
+                sensor.name,
+                sensor.type,
+                sensor.value,
+                sensor.unit,
+                sensor.updated_at
+            ));
+            this.render()
+        } catch (error) {
+            console.error('Error en carga de sensores: ', error);
+        }
+    }
 
     render() {
         const container = document.getElementById("sensor-container");
@@ -97,7 +113,7 @@ setaddSensor(sensor) {
         updateButtons.forEach((button) => {
             button.addEventListener("click", (event) => {
                 event.preventDefault();
-                const sensorId = parseInt(button.getAttribute("data-id"));
+                const sensorId = button.getAttribute("data-id");
                 this.updateSensor(sensorId);
             });
         });
@@ -106,4 +122,8 @@ setaddSensor(sensor) {
 
 const monitor = new SensorManager();
 
-monitor.loadSensors("sensors.json");
+document.addEventListener('DOMContentLoaded', () => {
+    monitor.loadSensors("sensors.json");
+});
+
+
