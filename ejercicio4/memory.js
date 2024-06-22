@@ -31,6 +31,22 @@ class Card {
         const cardElement = this.element.querySelector(".card");
         cardElement.classList.remove("flipped");
     }
+
+    //Definir el método `toggleFlip()` que cambia el estado de volteo de la carta en función de su estado actual
+    toggleFlip() {
+        if (this.isFlipped) {
+            this.#unflip();
+        } else {
+            this.#flip();
+        }
+        this.isFlipped = !this.isFlipped;
+    }
+
+    //Implementar el método `matches(otherCard)` que verifica si la carta actual coincide con otra carta
+    matches(otherCard) {
+        return this.name === otherCard.name;
+    }
+
 }
 
 class Board {
@@ -58,6 +74,20 @@ class Board {
         this.fixedGridElement.className = `fixed-grid has-${columns}-cols`;
     }
 
+    //Implementar el método `shuffleCards()` que mezcla las cartas del tablero. El criterio de mezcla esta dispuesto a elección del estudiante
+    shuffleCards() {
+        this.cards = this.cards.sort(() => Math.random() - 0.5);
+    }
+
+    //Implementar el método `flipDownAllCards()` que posiciona todas las cartas en su estado inicial. Es necesario para reiniciar el tablero.
+    flipDownAllCards() {
+        this.cards.forEach(card => {
+            if (card.isFlipped) {
+                card.toggleFlip();
+            }
+        });
+    }
+
     render() {
         this.#setGridColumns();
         this.gameBoardElement.innerHTML = "";
@@ -73,6 +103,12 @@ class Board {
         if (this.onCardClick) {
             this.onCardClick(card);
         }
+    }
+
+    //reset que inicia el tablero
+    reset() {
+        this.shuffleCards();
+        this.render();
     }
 }
 
@@ -101,6 +137,31 @@ class MemoryGame {
                 setTimeout(() => this.checkForMatch(), this.flipDuration);
             }
         }
+    }
+
+    //Implementar el método `checkForMatch()` que verifica si las cartas volteadas coinciden. En caso de coincidir, las cartas deben ser añadidas al conjunto de cartas emparejadas. Es fundamental para que el método `#handleCardClick()` funcione correctamente.
+    checkForMatch() {
+        const [card1, card2] = this.flippedCards;
+        if (card1.matches(card2)) {
+            this.matchedCards.push(card1, card2);
+        } else {
+            card1.toggleFlip();
+            card2.toggleFlip();
+        }
+        this.flippedCards = [];
+
+        if (this.matchedCards.length === this.board.cards.length) {
+            alert("¡Has ganado!");
+            this.resetGame();
+        }
+    }
+
+    //Implementar el método `resetGame()` que reinicia el juego. Debe emplear otros métodos de la clase `MemoryGame` para realizar esta tarea.
+    resetGame() {
+        this.flippedCards = [];
+        this.matchedCards = [];
+        this.board.flipDownAllCards();
+        setTimeout(() => this.board.reset(), this.flipDuration);
     }
 }
 
